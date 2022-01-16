@@ -19,9 +19,8 @@ var module = (function() {
 
     function _animate(context) {
         var { label_id, from, to, options, canceled, round } = context;
-        var { duration } = options;
-        var interval = Math.max(options["interval"] || 0, 0.005);
-        var step = duration ? parseInt(duration / interval - 0.5) : 10;
+        var interval = Math.max(options["interval"] || 0, 0.01);
+        var step = options["step"] || 20;
 
         if (!canceled && round < step) {
             timeout(interval, function() {
@@ -48,9 +47,13 @@ var module = (function() {
     }
 
     function _format_amount(number, options) {
-        return number.toFixed(options["decimals"] || 5)
-                     .replace(/0+$/, "")
-                     .replace(/\.$/, options["truncates-point"] ? "" : ".0");
+        var text = number.toFixed(options["decimals"] || 5);
+
+        if (options["truncates-zero"]) {
+            text = text.replace(/0+$/, "").replace(/\.$/, options["truncates-point"] ? "" : ".0");
+        }
+
+        return text;
     }
     
     return {
