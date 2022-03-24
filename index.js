@@ -46,16 +46,27 @@ var module = (function() {
         });
     }
 
-    function _format_amount(number, options) {
-        var text = number.toFixed(options["decimals"] || 5);
+    function _format_amount(number, options={}) {
+        var decimals = options["decimals"] || 5;
+        var text = number.toFixed(decimals);
 
-        if (options["truncates-zero"]) {
+        if (decimals > 0 && options["truncates-zero"]) {
             text = text.replace(/0+$/, "").replace(/\.$/, options["truncates-point"] ? "" : ".0");
+        }
+
+        if (options["format-with-commas"]) {
+            var [ number, decimal ] = text.split(".");
+
+            if (decimal) {
+                text = [ number.replace(/\B(?=(\d{3})+(?!\d))/g, ","), decimal ].join(".");
+            } else {
+                text = number.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }
         }
 
         return text;
     }
-    
+
     return {
         animate: function(label_id, from, to, options) {
             var context = _create_context(label_id, from, to, options || {});
